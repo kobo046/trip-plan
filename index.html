@@ -9,11 +9,11 @@
     <meta name="theme-color" content="#f8f3e9" />
     <meta
       name="description"
-      content="把名古屋的小旅行，收進口袋。可編輯行程、整理旅費與收拾行李的可愛旅行手帳。"
+      content="2026/12/28–2027/01/05 北海道過年示範。可編輯行程、整理旅費與收拾冬季行李的可愛旅行手帳。"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <title>旅日手帳 · 名古屋小旅行</title>
+    <title>旅日手帳 · 過年去北海道</title>
     <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -30,10 +30,21 @@
     <div class="app-shell">
       <header class="brand">
         <div>
-          <span class="eyebrow">日本・名古屋</span>
-          <h1>旅日手帳<span class="brand-star" aria-hidden="true">✳</span></h1>
+          <span class="eyebrow" id="brand-eyebrow">日本・北海道</span>
+          <h1>
+            <span id="brand-title">旅日手帳</span
+            ><span class="brand-star" aria-hidden="true">✳</span>
+          </h1>
         </div>
-        <div class="trip-stamp">冬日小旅行<span>12.03 — 12.10</span></div>
+        <div class="brand-tools">
+          <div class="trip-stamp">
+            <b id="stamp-label">過年去北海道</b
+            ><span id="stamp-dates">12.28 — 01.05</span>
+          </div>
+          <button type="button" id="open-settings" class="small-button">
+            ⚙ 旅程設定
+          </button>
+        </div>
       </header>
       <nav class="main-tabs" aria-label="旅行手帳分頁">
         <button type="button" data-tab="plan" aria-current="page">
@@ -84,11 +95,18 @@
               aria-hidden="true"
             ></div>
             <div
-              class="week-strip"
-              id="week-strip"
-              role="group"
-              aria-label="選擇旅行日期"
-            ></div>
+              class="week-scroll"
+              tabindex="0"
+              role="region"
+              aria-label="旅行日期，可左右捲動"
+            >
+              <div
+                class="week-strip"
+                id="week-strip"
+                role="group"
+                aria-label="選擇旅行日期"
+              ></div>
+            </div>
           </div>
           <div class="day-heading">
             <div
@@ -97,8 +115,8 @@
               aria-hidden="true"
             ></div>
             <div>
-              <h3 id="day-title">第 4 天 · 12/06</h3>
-              <p id="day-subtitle">金城埠頭，鐵道與海風</p>
+              <h3 id="day-title">第 1 天 · 12/28</h3>
+              <p id="day-subtitle">抵達札幌，先安頓</p>
             </div>
           </div>
           <div id="day-navigation" class="day-navigation" hidden>
@@ -110,8 +128,8 @@
               <input
                 type="date"
                 id="selected-date"
-                min="2026-12-03"
-                max="2026-12-10"
+                min="2026-12-28"
+                max="2027-01-05"
             /></label>
             <button type="button" id="next-day" aria-label="後一天">→</button>
           </div>
@@ -158,7 +176,9 @@
               <span class="eyebrow">這趟旅行的總花費</span>
               <div id="grand-total" class="grand-total"></div>
               <p id="hkd-total"></p>
-              <small>估算匯率 ¥1 ≈ HK$0.052 · 僅供記帳參考</small>
+              <small id="exchange-note"
+                >估算匯率 ¥1 ≈ HK$0.052 · 可在旅程設定修改</small
+              >
             </div>
             <h3 class="section-title">錢錢都去哪了？</h3>
             <div
@@ -233,8 +253,8 @@
         <aside class="trip-note">
           <span aria-hidden="true">✿</span>
           <div>
-            把日子排好，把心情留白。<small
-              >名古屋 8 天示範行程・所有內容都可以編輯</small
+            把日子排好，把心情留白。<small id="trip-summary"
+              >北海道 9 天示範行程・所有內容都可以編輯</small
             >
           </div>
         </aside>
@@ -244,6 +264,161 @@
         ><button type="button" id="reset-data">還原示範資料</button>
       </footer>
     </div>
+    <dialog
+      id="settings-dialog"
+      class="sheet settings-sheet"
+      aria-labelledby="settings-title"
+    >
+      <div class="sheet-header">
+        <div>
+          <span class="eyebrow">把手帳變成你的旅程</span>
+          <h2 id="settings-title">旅程設定</h2>
+        </div>
+        <button
+          type="button"
+          class="close-button"
+          data-close="settings-dialog"
+          aria-label="關閉旅程設定"
+        >
+          ×
+        </button>
+      </div>
+      <form id="settings-form" class="editor-form settings-form" novalidate>
+        <p class="notice">
+          改動只存在呢部裝置嘅瀏覽器，唔會自動同步。換手機、換瀏覽器或清除網站資料之前，記得先匯出備份。<br />改好後撳「儲存設定」就會即時更新手帳。
+        </p>
+        <section class="settings-section" aria-labelledby="trip-info-title">
+          <h3 id="trip-info-title">旅程資料</h3>
+          <label
+            >手帳標題<input name="tripTitle" maxlength="100" required
+          /></label>
+          <label
+            >目的地<input name="destination" maxlength="100" required
+          /></label>
+          <label
+            >上方小標<input name="eyebrow" maxlength="100" required
+          /></label>
+          <label>印章文案<input name="stamp" maxlength="100" required /></label>
+        </section>
+        <section class="settings-section" aria-labelledby="trip-dates-title">
+          <h3 id="trip-dates-title">旅行日期</h3>
+          <div class="form-row">
+            <label>出發日<input name="startDate" type="date" required /></label>
+            <label>回程日<input name="endDate" type="date" required /></label>
+          </div>
+          <p
+            id="settings-day-count"
+            class="settings-help"
+            aria-live="polite"
+          ></p>
+          <p class="settings-help">
+            可以安排 1–30
+            日。原有記錄按實際日期保留；移出範圍嘅日子如有行程或費用，儲存前會再問你。
+          </p>
+        </section>
+        <details class="settings-section">
+          <summary>每日標題／主題</summary>
+          <p class="settings-help">撳開逐日修改，會顯示喺每日時間軸下方。</p>
+          <div id="settings-themes"></div>
+        </details>
+        <section class="settings-section" aria-labelledby="trip-rate-title">
+          <h3 id="trip-rate-title">港幣估算匯率</h3>
+          <label
+            >¥1 約等於幾多港幣？<input
+              name="exchangeRate"
+              type="number"
+              min="0.000001"
+              max="1000"
+              step="any"
+              required
+              inputmode="decimal"
+          /></label>
+          <p class="settings-help">
+            例如 0.052，即 ¥1 ≈ HK$0.052。費用總覽會即時重新計算。
+          </p>
+        </section>
+        <details class="settings-section">
+          <summary>攜帶用品分類</summary>
+          <p class="settings-help">
+            直接改分類名稱，用品會一齊跟住改。刪除前先揀好用品搬去邊一類，最少保留一類。
+          </p>
+          <div id="settings-groups"></div>
+          <label
+            >新增分類<input
+              id="new-group-name"
+              maxlength="60"
+              placeholder="例如：小朋友用品"
+          /></label>
+          <button type="button" id="add-group" class="small-button">
+            ＋ 新增分類
+          </button>
+        </details>
+        <section class="settings-section" aria-labelledby="backup-title">
+          <h3 id="backup-title">備份與還原</h3>
+          <p class="settings-help">
+            匯出會下載全部已儲存嘅旅程、行程、費用同行李。設定有改動請先儲存，再匯出。換機後喺新裝置打開手帳，再匯入呢份
+            JSON 就得。
+          </p>
+          <div class="backup-actions">
+            <button type="button" id="export-backup" class="secondary-button">
+              匯出備份
+            </button>
+            <button type="button" id="import-backup" class="secondary-button">
+              匯入備份
+            </button>
+          </div>
+          <input
+            type="file"
+            id="backup-file"
+            accept=".json,application/json"
+            hidden
+          />
+          <p id="backup-status" class="settings-help" role="status"></p>
+          <p id="backup-error" class="form-error" role="alert"></p>
+          <button type="button" id="settings-reset" class="delete-button">
+            還原示範資料
+          </button>
+        </section>
+        <div class="settings-save-bar">
+          <p id="settings-error" class="form-error" role="alert"></p>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="secondary-button"
+              data-close="settings-dialog"
+            >
+              取消
+            </button>
+            <button type="submit" class="primary-button">儲存設定</button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="packing-editor-dialog"
+      class="sheet"
+      aria-labelledby="packing-editor-title"
+    >
+      <div class="sheet-header">
+        <h2 id="packing-editor-title">編輯攜帶用品</h2>
+        <button
+          type="button"
+          class="close-button"
+          data-close="packing-editor-dialog"
+          aria-label="關閉用品編輯"
+        >
+          ×
+        </button>
+      </div>
+      <form id="packing-editor-form" class="editor-form" novalidate>
+        <label>用品名稱<input name="title" maxlength="60" required /></label>
+        <label>分類<select name="group"></select></label>
+        <p id="packing-editor-error" class="form-error" role="alert"></p>
+        <div class="form-actions">
+          <button type="submit" class="primary-button">儲存用品</button>
+        </div>
+      </form>
+    </dialog>
     <dialog id="editor-dialog" class="sheet" aria-labelledby="editor-title">
       <div class="sheet-header">
         <div>
@@ -268,8 +443,8 @@
             >日期<input
               name="date"
               type="date"
-              min="2026-12-03"
-              max="2026-12-10"
+              min="2026-12-28"
+              max="2027-01-05"
               required /></label
           ><label
             >分類<select name="category">

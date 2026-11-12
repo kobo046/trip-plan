@@ -95,6 +95,27 @@ svg {
   align-items: center;
   justify-content: space-between;
   padding: 0 6px 19px;
+  gap: 12px;
+}
+.brand > div {
+  min-width: 0;
+}
+.brand h1,
+.brand .eyebrow,
+.trip-stamp {
+  overflow-wrap: anywhere;
+}
+.brand-tools {
+  display: grid;
+  gap: 10px;
+  flex: 0 0 118px;
+}
+.brand-tools .small-button {
+  font-size: 13px;
+  min-height: 44px;
+}
+.trip-stamp b {
+  font-weight: 400;
 }
 .eyebrow {
   font-size: 10px;
@@ -258,7 +279,8 @@ svg {
 }
 .week-strip {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--days, 8), minmax(0, 1fr));
+  min-width: calc(var(--days, 8) * 40px);
   position: relative;
   padding-top: 9px;
 }
@@ -266,9 +288,14 @@ svg {
   content: "";
   position: absolute;
   top: 14px;
-  left: 6.25%;
-  right: 6.25%;
+  left: calc(50% / var(--days, 8));
+  right: calc(50% / var(--days, 8));
   border-top: 2px solid #4b443e;
+}
+.week-scroll {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding-bottom: 3px;
 }
 .day-button {
   position: relative;
@@ -324,7 +351,11 @@ svg {
 .day-heading h3 {
   font-size: 18px;
   letter-spacing: 0.025em;
-  white-space: nowrap;
+  white-space: normal;
+}
+.day-heading > div:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .day-heading p {
   font-size: 10px;
@@ -921,6 +952,14 @@ progress::-moz-progress-bar {
   min-width: 36px;
   min-height: 44px;
 }
+.packing-edit {
+  min-height: 44px;
+  min-width: 44px;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .sheet {
   background: var(--paper);
   color: var(--ink);
@@ -968,6 +1007,90 @@ body:has(dialog[open]) {
 }
 .editor-form {
   padding: 17px;
+}
+.settings-sheet {
+  margin: auto auto max(12px, env(safe-area-inset-bottom));
+}
+.settings-sheet .sheet-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.settings-form {
+  padding-bottom: 0;
+}
+.settings-sheet button {
+  min-height: 44px;
+}
+.settings-form label,
+.settings-help {
+  font-size: 14px;
+}
+.settings-form input,
+.settings-form select {
+  font-size: 16px;
+  min-height: 46px;
+}
+.settings-section {
+  padding: 8px 0 18px;
+  margin-bottom: 16px;
+  border-bottom: 2px dashed var(--line);
+}
+.settings-section h3,
+.settings-section summary {
+  font-size: 18px;
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+.settings-section summary {
+  min-height: 44px;
+  cursor: pointer;
+  padding: 8px 0;
+}
+.settings-help {
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+.settings-form .notice {
+  font-size: 14px;
+}
+.settings-group-row {
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+.settings-group-row .delete-button {
+  min-height: 44px;
+}
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.settings-save-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: var(--paper);
+  margin: 0 -17px;
+  padding: 10px 17px max(16px, env(safe-area-inset-bottom));
+  border-top: 2px solid var(--ink);
+}
+.settings-save-bar button,
+.backup-actions button {
+  font-size: 16px;
+  min-height: 46px;
+}
+.settings-save-bar .form-error {
+  font-size: 14px;
+}
+.settings-form input[type="date"] {
+  min-width: 0;
+  padding-inline: 5px;
 }
 .editor-form label {
   display: flex;
