@@ -1,0 +1,9 @@
+# Local reference material and execution files are not part of the public site.
+screenshot-ref.*
+codex-*.log
+codex-*.pid
+codex-prompt.md
+run-codex.cmd
+node_modules/
+test-results/
+.local-test/

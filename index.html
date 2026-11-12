@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#f8f3e9" />
+    <meta
+      name="description"
+      content="把名古屋的小旅行，收進口袋。可編輯行程、整理旅費與收拾行李的可愛旅行手帳。"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>旅日手帳 · 名古屋小旅行</title>
+    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="brand">
+        <div>
+          <span class="eyebrow">日本・名古屋</span>
+          <h1>旅日手帳<span class="brand-star" aria-hidden="true">✳</span></h1>
+        </div>
+        <div class="trip-stamp">冬日小旅行<span>12.03 — 12.10</span></div>
+      </header>
+      <nav class="main-tabs" aria-label="旅行手帳分頁">
+        <button type="button" data-tab="plan" aria-current="page">
+          行程規劃
+        </button>
+        <button type="button" data-tab="expenses">費用總覽</button>
+        <button type="button" data-tab="packing">攜帶用品</button>
+      </nav>
+      <main id="main-content">
+        <section id="plan-panel" class="panel calendar" aria-label="行程規劃">
+          <header class="panel-header calendar-header">
+            <div class="calendar-title">
+              <h2>行事曆</h2>
+              <p>2026 年 12 月</p>
+            </div>
+            <div class="calendar-tools">
+              <div class="view-switch" role="group" aria-label="行事曆顯示方式">
+                <button type="button" data-view="week" aria-pressed="true">
+                  週行事曆
+                </button>
+                <button type="button" data-view="day" aria-pressed="false">
+                  單日時間軸
+                </button>
+              </div>
+              <button
+                type="button"
+                id="collapse-week"
+                class="collapse-button"
+                aria-label="收起日期列"
+                aria-expanded="true"
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                id="add-activity"
+                class="square-button"
+                aria-label="新增行程"
+              >
+                ＋
+              </button>
+            </div>
+          </header>
+          <div id="week-section" class="week-section">
+            <div
+              class="station-scene"
+              id="station-scene"
+              aria-hidden="true"
+            ></div>
+            <div
+              class="week-strip"
+              id="week-strip"
+              role="group"
+              aria-label="選擇旅行日期"
+            ></div>
+          </div>
+          <div class="day-heading">
+            <div
+              class="day-illustration"
+              id="day-illustration"
+              aria-hidden="true"
+            ></div>
+            <div>
+              <h3 id="day-title">第 4 天 · 12/06</h3>
+              <p id="day-subtitle">金城埠頭，鐵道與海風</p>
+            </div>
+          </div>
+          <div id="day-navigation" class="day-navigation" hidden>
+            <button type="button" id="previous-day" aria-label="前一天">
+              ←
+            </button>
+            <label
+              >旅行日期
+              <input
+                type="date"
+                id="selected-date"
+                min="2026-12-03"
+                max="2026-12-10"
+            /></label>
+            <button type="button" id="next-day" aria-label="後一天">→</button>
+          </div>
+          <div class="timeline-board" id="timeline-board">
+            <div
+              class="time-rail"
+              id="time-rail"
+              aria-label="當日時間分布"
+            ></div>
+            <div
+              class="activity-list"
+              id="activity-list"
+              tabindex="0"
+              role="region"
+              aria-label="當日行程，向下捲動查看所有卡片"
+            ></div>
+          </div>
+          <div class="scroll-hint" id="scroll-hint">
+            往下滑動卡片，看看接下來的旅程 ↓
+          </div>
+          <footer class="calendar-footer">
+            <div class="legend">
+              <span><i class="dot sight"></i>景點</span
+              ><span><i class="dot food"></i>餐飲</span
+              ><span><i class="dot stay"></i>住宿</span
+              ><span><i class="dot transport"></i>交通／航班</span>
+            </div>
+            <div class="interaction-hint">單擊預覽・雙擊編輯</div>
+            <label class="lock-toggle"
+              ><input type="checkbox" id="global-lock" />已確認時間鎖定</label
+            >
+          </footer>
+        </section>
+        <section id="expenses-panel" class="panel" aria-label="費用總覽" hidden>
+          <header class="panel-header">
+            <div>
+              <h2>旅行的小帳本</h2>
+              <p>美好的回憶，也好好記帳。</p>
+            </div>
+            <span class="header-doodle" aria-hidden="true">¥</span>
+          </header>
+          <div class="panel-body">
+            <div class="total-ticket">
+              <span class="eyebrow">這趟旅行的總花費</span>
+              <div id="grand-total" class="grand-total"></div>
+              <p id="hkd-total"></p>
+              <small>估算匯率 ¥1 ≈ HK$0.052 · 僅供記帳參考</small>
+            </div>
+            <h3 class="section-title">錢錢都去哪了？</h3>
+            <div
+              id="expense-chart"
+              class="expense-chart"
+              aria-label="各類別費用比例"
+            ></div>
+            <div id="expense-categories" class="expense-categories"></div>
+            <div class="section-heading">
+              <h3>每一筆小記錄</h3>
+              <button type="button" id="add-expense" class="small-button">
+                ＋ 記一筆
+              </button>
+            </div>
+            <p class="help-text">行程費用會自動同步；點選記錄即可編輯。</p>
+            <div id="expense-list" class="expense-list"></div>
+          </div>
+        </section>
+        <section
+          id="packing-panel"
+          class="panel packing-panel"
+          aria-label="攜帶用品"
+          hidden
+        >
+          <header class="panel-header">
+            <div>
+              <h2>行李準備好了嗎？</h2>
+              <p>把期待，和必需品一起裝好。</p>
+            </div>
+            <span class="header-doodle" aria-hidden="true">✳</span>
+          </header>
+          <div class="panel-body">
+            <div class="packing-ticket">
+              <div class="suitcase" aria-hidden="true"><span></span>✿</div>
+              <div>
+                <span class="eyebrow">出發前的小任務</span>
+                <h3 id="packing-count"></h3>
+                <p id="packing-message"></p>
+              </div>
+              <progress
+                id="packing-progress"
+                max="1"
+                value="0"
+                aria-label="收拾行李進度"
+              ></progress>
+            </div>
+            <form id="packing-add-form" class="packing-add-form">
+              <label class="sr-only" for="packing-new">新增攜帶用品</label
+              ><input
+                id="packing-new"
+                placeholder="還有什麼要帶呢？"
+                maxlength="60"
+                required
+              /><label class="sr-only" for="packing-group">用品分類</label
+              ><select id="packing-group">
+                <option>衣服</option>
+                <option>證件</option>
+                <option>電子</option>
+                <option>藥品</option>
+                <option>其他</option></select
+              ><button
+                type="submit"
+                class="square-button"
+                aria-label="新增用品"
+              >
+                ＋
+              </button>
+            </form>
+            <div id="packing-groups"></div>
+          </div>
+        </section>
+        <aside class="trip-note">
+          <span aria-hidden="true">✿</span>
+          <div>
+            把日子排好，把心情留白。<small
+              >名古屋 8 天示範行程・所有內容都可以編輯</small
+            >
+          </div>
+        </aside>
+      </main>
+      <footer class="page-footer">
+        <span>旅程收在這個瀏覽器裡 ♡</span
+        ><button type="button" id="reset-data">還原示範資料</button>
+      </footer>
+    </div>
+    <dialog id="editor-dialog" class="sheet" aria-labelledby="editor-title">
+      <div class="sheet-header">
+        <div>
+          <span class="eyebrow">收藏旅途的小回憶</span>
+          <h2 id="editor-title">新增行程</h2>
+        </div>
+        <button
+          type="button"
+          class="close-button"
+          data-close="editor-dialog"
+          aria-label="關閉表單"
+        >
+          ×
+        </button>
+      </div>
+      <form id="editor-form" class="editor-form">
+        <p id="editor-lock-note" class="notice" hidden>
+          此行程已確認，日期與時間受到保護。取消下方「已確認」並儲存後即可解除；也可關閉主畫面的時間鎖定。
+        </p>
+        <div class="form-row">
+          <label
+            >日期<input
+              name="date"
+              type="date"
+              min="2026-12-03"
+              max="2026-12-10"
+              required /></label
+          ><label
+            >分類<select name="category">
+              <option value="sight">景點</option>
+              <option value="food">餐飲</option>
+              <option value="stay">住宿</option>
+              <option value="transport">交通／航班</option>
+            </select></label
+          >
+        </div>
+        <div class="form-row itinerary-field">
+          <label>開始時間<input name="start" type="time" required /></label
+          ><label>結束時間<input name="end" type="time" required /></label>
+        </div>
+        <label
+          >名稱<input
+            name="title"
+            maxlength="100"
+            placeholder="這一站，想去哪裡？"
+            required
+        /></label>
+        <div class="form-row">
+          <label
+            >費用（¥）<input
+              name="cost"
+              type="number"
+              min="0"
+              max="999999999"
+              step="1"
+              value="0"
+              required /></label
+          ><label class="itinerary-field"
+            >費用說明<input
+              name="costLabel"
+              maxlength="20"
+              placeholder="例如：全家"
+          /></label>
+        </div>
+        <label
+          >備註<textarea
+            name="notes"
+            rows="3"
+            maxlength="2000"
+            placeholder="想記下的小提醒…"
+          ></textarea>
+        </label>
+        <fieldset class="itinerary-field transport-fields">
+          <legend>交通細節（選填）</legend>
+          <div class="form-row">
+            <label
+              >從<input
+                name="routeFrom"
+                maxlength="100"
+                placeholder="出發地" /></label
+            ><label
+              >到<input name="routeTo" maxlength="100" placeholder="目的地"
+            /></label>
+          </div>
+          <div class="form-row three-columns">
+            <label
+              >步行（分鐘）<input
+                name="walk1"
+                type="number"
+                min="0"
+                max="1440" /></label
+            ><label
+              >火車（分鐘）<input
+                name="train"
+                type="number"
+                min="0"
+                max="1440" /></label
+            ><label
+              >步行（分鐘）<input name="walk2" type="number" min="0" max="1440"
+            /></label>
+          </div>
+        </fieldset>
+        <label class="check-label itinerary-field"
+          ><input name="locked" type="checkbox" />已確認／鎖定此行程</label
+        >
+        <p id="form-error" class="form-error" role="alert"></p>
+        <div class="form-actions">
+          <button type="button" id="delete-item" class="delete-button">
+            刪除</button
+          ><button
+            type="button"
+            class="secondary-button"
+            data-close="editor-dialog"
+          >
+            取消</button
+          ><button type="submit" class="primary-button">儲存</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="preview-dialog"
+      class="sheet preview-sheet"
+      aria-labelledby="preview-title"
+    >
+      <div class="sheet-header">
+        <h2 id="preview-title">行程預覽</h2>
+        <button
+          type="button"
+          class="close-button"
+          data-close="preview-dialog"
+          aria-label="關閉預覽"
+        >
+          ×
+        </button>
+      </div>
+      <div id="preview-content"></div>
+      <div class="preview-actions">
+        <button type="button" id="preview-edit" class="primary-button">
+          編輯這段旅程
+        </button>
+      </div>
+    </dialog>
+    <dialog
+      id="confirm-dialog"
+      class="sheet confirm-sheet"
+      aria-labelledby="confirm-title"
+    >
+      <h2 id="confirm-title">確認刪除？</h2>
+      <p id="confirm-message"></p>
+      <div class="form-actions">
+        <button type="button" id="confirm-cancel" class="secondary-button">
+          取消</button
+        ><button type="button" id="confirm-accept" class="primary-button">
+          確認
+        </button>
+      </div>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <noscript
+      ><p class="noscript">
+        請啟用 JavaScript，使用行程編輯與本機儲存功能。
+      </p></noscript
+    >
+  </body>
+</html>
