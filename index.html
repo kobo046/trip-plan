@@ -9,11 +9,11 @@
     <meta name="theme-color" content="#f8f3e9" />
     <meta
       name="description"
-      content="2026/12/28–2027/01/05 北海道過年示範。可編輯行程、整理旅費與收拾冬季行李的可愛旅行手帳。"
+      content="兩人過年去北海道：雪見溫泉、牽手看夜景與酒店倒數。可編輯的 9 日示範、出發倒數、旅費與冬季行李手帳。"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <title>旅日手帳 · 過年去北海道</title>
+    <title>旅日手帳 · 兩人過年去北海道</title>
     <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -30,7 +30,7 @@
     <div class="app-shell">
       <header class="brand">
         <div>
-          <span class="eyebrow" id="brand-eyebrow">日本・北海道</span>
+          <span class="eyebrow" id="brand-eyebrow">同你喺雪地過新年</span>
           <h1>
             <span id="brand-title">旅日手帳</span
             ><span class="brand-star" aria-hidden="true">✳</span>
@@ -38,7 +38,7 @@
         </div>
         <div class="brand-tools">
           <div class="trip-stamp">
-            <b id="stamp-label">過年去北海道</b
+            <b id="stamp-label">兩人過年去北海道</b
             ><span id="stamp-dates">12.28 — 01.05</span>
           </div>
           <button type="button" id="open-settings" class="small-button">
@@ -46,6 +46,21 @@
           </button>
         </div>
       </header>
+      <section class="countdown-ticket" aria-labelledby="countdown-heading">
+        <div class="countdown-topline">
+          <span class="eyebrow" id="countdown-heading">下一站・雪地回憶</span>
+          <span class="countdown-snow" aria-hidden="true">❄ ♡ ❄</span>
+        </div>
+        <p
+          id="countdown-status"
+          class="countdown-status"
+          aria-live="polite"
+          aria-atomic="true"
+        ></p>
+        <p id="countdown-detail" class="countdown-detail"></p>
+        <p id="countdown-date" class="countdown-date"></p>
+        <small>以日本時間計 · 出發日 00:00 起</small>
+      </section>
       <nav class="main-tabs" aria-label="旅行手帳分頁">
         <button type="button" data-tab="plan" aria-current="page">
           行程規劃
@@ -54,6 +69,15 @@
         <button type="button" data-tab="packing">攜帶用品</button>
       </nav>
       <main id="main-content">
+        <aside
+          id="trip-highlights"
+          class="trip-highlights"
+          aria-label="旅程亮點"
+          hidden
+        >
+          <h2>旅程亮點 <span aria-hidden="true">✧</span></h2>
+          <ul id="highlight-chips"></ul>
+        </aside>
         <section id="plan-panel" class="panel calendar" aria-label="行程規劃">
           <header class="panel-header calendar-header">
             <div class="calendar-title">
@@ -173,9 +197,10 @@
           </header>
           <div class="panel-body">
             <div class="total-ticket">
-              <span class="eyebrow">這趟旅行的總花費</span>
+              <span class="eyebrow" id="budget-label">兩人示範預算</span>
               <div id="grand-total" class="grand-total"></div>
               <p id="hkd-total"></p>
+              <p id="per-person-total"></p>
               <small id="exchange-note"
                 >估算匯率 ¥1 ≈ HK$0.052 · 可在旅程設定修改</small
               >
@@ -347,7 +372,7 @@
             >新增分類<input
               id="new-group-name"
               maxlength="60"
-              placeholder="例如：小朋友用品"
+              placeholder="例如：溫泉小物"
           /></label>
           <button type="button" id="add-group" class="small-button">
             ＋ 新增分類
@@ -480,7 +505,7 @@
             >費用說明<input
               name="costLabel"
               maxlength="20"
-              placeholder="例如：全家"
+              placeholder="例如：兩人示範"
           /></label>
         </div>
         <label
