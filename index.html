@@ -9,11 +9,11 @@
     <meta name="theme-color" content="#f8f3e9" />
     <meta
       name="description"
-      content="兩人過年去北海道：雪見溫泉、牽手看夜景與酒店倒數。可編輯的 9 日示範、出發倒數、旅費與冬季行李手帳。"
+      content="澳門兩日一夜情侶行程：2026/11/29–11/30，美食、舊城區與路氹散步。可編輯的示範行程、出發倒數、旅費與攜帶用品。"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <title>旅日手帳 · 兩人過年去北海道</title>
+    <title>旅日手帳 · 澳門兩日一夜情侶行程</title>
     <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -23,14 +23,16 @@
       href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css" />
-    <script src="./app.js" defer></script>
+    <link rel="stylesheet" href="./styles.css?v=20261126-macau" />
+    <script src="./app.js?v=20261126-macau" defer></script>
   </head>
   <body>
     <div class="app-shell">
       <header class="brand">
         <div>
-          <span class="eyebrow" id="brand-eyebrow">同你喺雪地過新年</span>
+          <span class="eyebrow" id="brand-eyebrow"
+            >同你去澳門，留一晚小回憶</span
+          >
           <h1>
             <span id="brand-title">旅日手帳</span
             ><span class="brand-star" aria-hidden="true">✳</span>
@@ -38,8 +40,8 @@
         </div>
         <div class="brand-tools">
           <div class="trip-stamp">
-            <b id="stamp-label">兩人過年去北海道</b
-            ><span id="stamp-dates">12.28 — 01.05</span>
+            <b id="stamp-label">澳門兩日一夜情侶行程</b
+            ><span id="stamp-dates">11.29 — 11.30</span>
           </div>
           <button type="button" id="open-settings" class="small-button">
             ⚙ 旅程設定
@@ -48,8 +50,8 @@
       </header>
       <section class="countdown-ticket" aria-labelledby="countdown-heading">
         <div class="countdown-topline">
-          <span class="eyebrow" id="countdown-heading">下一站・雪地回憶</span>
-          <span class="countdown-snow" aria-hidden="true">❄ ♡ ❄</span>
+          <span class="eyebrow" id="countdown-heading">下一站・澳門</span>
+          <span class="countdown-snow" aria-hidden="true">✧ ♡ ✧</span>
         </div>
         <p
           id="countdown-status"
@@ -59,7 +61,9 @@
         ></p>
         <p id="countdown-detail" class="countdown-detail"></p>
         <p id="countdown-date" class="countdown-date"></p>
-        <small>以日本時間計 · 出發日 00:00 起</small>
+        <small id="countdown-zone"
+          >以澳門時間計 · Asia/Macau（UTC+8）· 出發日 00:00 起</small
+        >
       </section>
       <nav class="main-tabs" aria-label="旅行手帳分頁">
         <button type="button" data-tab="plan" aria-current="page">
@@ -82,7 +86,7 @@
           <header class="panel-header calendar-header">
             <div class="calendar-title">
               <h2>行事曆</h2>
-              <p>2026 年 12 月</p>
+              <p>2026 年 11 月</p>
             </div>
             <div class="calendar-tools">
               <div class="view-switch" role="group" aria-label="行事曆顯示方式">
@@ -139,8 +143,8 @@
               aria-hidden="true"
             ></div>
             <div>
-              <h3 id="day-title">第 1 天 · 12/28</h3>
-              <p id="day-subtitle">抵達札幌，先安頓</p>
+              <h3 id="day-title">第 1 天 · 11/29</h3>
+              <p id="day-subtitle">澳門半島美食 ＋ 舊城區打卡</p>
             </div>
           </div>
           <div id="day-navigation" class="day-navigation" hidden>
@@ -152,8 +156,8 @@
               <input
                 type="date"
                 id="selected-date"
-                min="2026-12-28"
-                max="2027-01-05"
+                min="2026-11-29"
+                max="2026-11-30"
             /></label>
             <button type="button" id="next-day" aria-label="後一天">→</button>
           </div>
@@ -179,7 +183,7 @@
               <span><i class="dot sight"></i>景點</span
               ><span><i class="dot food"></i>餐飲</span
               ><span><i class="dot stay"></i>住宿</span
-              ><span><i class="dot transport"></i>交通／航班</span>
+              ><span><i class="dot transport"></i>交通</span>
             </div>
             <div class="interaction-hint">單擊預覽・雙擊編輯</div>
             <label class="lock-toggle"
@@ -193,7 +197,7 @@
               <h2>旅行的小帳本</h2>
               <p>美好的回憶，也好好記帳。</p>
             </div>
-            <span class="header-doodle" aria-hidden="true">¥</span>
+            <span class="header-doodle" aria-hidden="true">$</span>
           </header>
           <div class="panel-body">
             <div class="total-ticket">
@@ -202,7 +206,7 @@
               <p id="hkd-total"></p>
               <p id="per-person-total"></p>
               <small id="exchange-note"
-                >估算匯率 ¥1 ≈ HK$0.052 · 可在旅程設定修改</small
+                >估算匯率 MOP$1 ≈ HK$0.97 · 可在旅程設定修改</small
               >
             </div>
             <h3 class="section-title">錢錢都去哪了？</h3>
@@ -278,8 +282,10 @@
         <aside class="trip-note">
           <span aria-hidden="true">✿</span>
           <div>
-            把日子排好，把心情留白。<small id="trip-summary"
-              >北海道 9 天示範行程・所有內容都可以編輯</small
+            把日子排好，把心情留白。<small
+              >示範行程，唔代表已訂房或已訂票。由深水埗出發，搭港珠澳大橋金巴往返；實際出發及回程時間待定。</small
+            ><small id="trip-summary"
+              >澳門 2 天示範行程・所有內容都可以編輯</small
             >
           </div>
         </aside>
@@ -349,7 +355,7 @@
         <section class="settings-section" aria-labelledby="trip-rate-title">
           <h3 id="trip-rate-title">港幣估算匯率</h3>
           <label
-            >¥1 約等於幾多港幣？<input
+            ><span id="rate-currency">MOP$1</span> 約等於幾多港幣？<input
               name="exchangeRate"
               type="number"
               min="0.000001"
@@ -358,8 +364,9 @@
               required
               inputmode="decimal"
           /></label>
-          <p class="settings-help">
-            例如 0.052，即 ¥1 ≈ HK$0.052。費用總覽會即時重新計算。
+          <p class="settings-help" id="rate-example">
+            例如 0.97，即 MOP$1 ≈
+            HK$0.97。澳門幣大約跟港幣掛鉤；呢個係估算，可自行修改。費用總覽會即時重新計算。
           </p>
         </section>
         <details class="settings-section">
@@ -372,7 +379,7 @@
             >新增分類<input
               id="new-group-name"
               maxlength="60"
-              placeholder="例如：溫泉小物"
+              placeholder="例如：隨身小物"
           /></label>
           <button type="button" id="add-group" class="small-button">
             ＋ 新增分類
@@ -468,15 +475,15 @@
             >日期<input
               name="date"
               type="date"
-              min="2026-12-28"
-              max="2027-01-05"
+              min="2026-11-29"
+              max="2026-11-30"
               required /></label
           ><label
             >分類<select name="category">
               <option value="sight">景點</option>
               <option value="food">餐飲</option>
               <option value="stay">住宿</option>
-              <option value="transport">交通／航班</option>
+              <option value="transport">交通</option>
             </select></label
           >
         </div>
@@ -493,7 +500,7 @@
         /></label>
         <div class="form-row">
           <label
-            >費用（¥）<input
+            >費用（<span id="cost-currency">MOP$</span>）<input
               name="cost"
               type="number"
               min="0"
@@ -536,7 +543,7 @@
                 min="0"
                 max="1440" /></label
             ><label
-              >火車（分鐘）<input
+              >乘車（分鐘）<input
                 name="train"
                 type="number"
                 min="0"

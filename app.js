@@ -1,9 +1,9 @@
 "use strict";
 
 // Everything stays on this device. No accounts, analytics, or remote data services.
-const STORAGE_KEY = "tabinichi-hokkaido-couple-2026-v2";
+const STORAGE_KEY = "tabinichi-macau-couple-2026-v1";
 const DAY_MS = 86400000;
-const DEFAULT_DATES = dateRange("2026-12-28", "2027-01-05");
+const DEFAULT_DATES = dateRange("2026-11-29", "2026-11-30");
 const CATEGORIES = {
   sight: { name: "景點", color: "#f2ce70" },
   food: { name: "餐飲", color: "#ee9c92" },
@@ -12,19 +12,14 @@ const CATEGORIES = {
 };
 const DEFAULT_GROUPS = ["衣服", "證件", "電子", "藥品", "其他"];
 const DEFAULT_THEMES = [
-  "同你抵達，札幌亮起燈",
-  "老建築、甜點，兩人慢慢行",
-  "小樽運河，等一盞煤氣燈",
-  "一碗年越蕎麥麵，一齊倒數",
-  "新年第一個願望，與你初詣",
-  "甜點約會，山上萬家燈火",
-  "定山溪，把時間留畀溫泉",
-  "慢早餐，再食一餐海鮮",
-  "帶住雪地回憶返香港",
+  "澳門半島美食 ＋ 舊城區打卡",
+  "氹仔掃街 ＋ 路氹歐陸風情",
 ];
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
-const yen = (value) => `¥${Math.round(value).toLocaleString("zh-TW")}`;
+const currencyLabel = () => (state.trip.currency === "JPY" ? "JPY" : "MOP$");
+const money = (value) =>
+  `${currencyLabel()}${Math.round(value).toLocaleString("zh-TW")}`;
 const escapeHTML = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -76,12 +71,14 @@ function dateRange(start, end) {
 function defaultTrip() {
   return {
     title: "旅日手帳",
-    destination: "北海道",
-    eyebrow: "同你喺雪地過新年",
-    stamp: "兩人過年去北海道",
+    destination: "澳門",
+    eyebrow: "同你去澳門，留一晚小回憶",
+    stamp: "澳門兩日一夜情侶行程",
     startDate: DEFAULT_DATES[0],
     endDate: DEFAULT_DATES.at(-1),
-    exchangeRate: 0.052,
+    currency: "MOP",
+    timeZone: "Asia/Macau",
+    exchangeRate: 0.97,
     themes: Object.fromEntries(
       DEFAULT_DATES.map((date, i) => [date, DEFAULT_THEMES[i]]),
     ),
@@ -114,16 +111,7 @@ const LOCK = SVG(
 
 function seedState() {
   const items = [];
-  const add = (
-    day,
-    category,
-    title,
-    start,
-    end,
-    cost = 0,
-    notes = "",
-    extra = {},
-  ) =>
+  const add = (day, category, title, start, end, notes) =>
     items.push({
       id: `sample-${items.length + 1}`,
       date: DEFAULT_DATES[day - 1],
@@ -131,568 +119,104 @@ function seedState() {
       title,
       start,
       end,
-      cost,
-      notes: `${notes} 時間／金額為兩人示範預算，請確認官方最新營業及票價。`,
+      cost: 0,
+      notes: `${notes} 時間軸為示範時段，可以再改；費用未填。`,
       costLabel: "兩人示範",
       locked: false,
-      ...extra,
     });
-  const room = (day, cost, start = "20:30", end = "21:00") =>
-    add(
-      day,
-      "stay",
-      "札幌酒店（請填寫）",
-      start,
-      end,
-      cost,
-      "兩位成人共一間雙人／雙床房，一晚房費；早餐另計，並非已訂房。今晚好好瞓。此時段只係入住／休息安排。",
-    );
-  const rail = (day, title, start, end, cost, from, to, train) =>
-    add(
-      day,
-      "transport",
-      title,
-      start,
-      end,
-      cost,
-      `每人單程示範 ¥${(cost / 2).toLocaleString("en-US")} × 2。車程約 ${train} 分鐘，前後步行各 10 分鐘；候車及雪天延誤另外留緩衝。時段並非班次。`,
-      {
-        routeFrom: from,
-        routeTo: to,
-        breakdown: { walk1: 10, train, walk2: 10 },
-      },
-    );
-
   add(
     1,
-    "transport",
-    "去程航班（請填寫）",
-    "13:00",
-    "14:30",
-    0,
-    "降落時間請按實際航班改；預留入境、取行李。機票未計，請補實際費用。",
-  );
-  rail(
-    1,
-    "JR 快速 Airport → 札幌",
-    "14:45",
-    "15:45",
-    2460,
-    "新千歲機場",
-    "札幌站",
-    40,
-  );
-  room(1, 18000, "16:15", "17:00");
-  add(
-    1,
-    "food",
-    "湯咖哩，暖返個胃",
-    "17:30",
-    "18:30",
-    4000,
-    "每人約 ¥2,000 × 2。揀辣度、加蔬菜，兩人慢慢食第一餐。",
-  );
-  add(
-    1,
-    "sight",
-    "燈樹節・牽手散步",
-    "19:00",
-    "20:00",
-    0,
-    "駅前通／南一條通揀近酒店一段行。亮燈 16:30–22:00；駅前通至 2027/2/11，南一条通及北3条広場アカプラ至 2027/3/14。大通會場已於 2026/12/25 結束；札幌雪祭係 2027 年 2 月，今次唔係雪祭。凍就入室內暖一暖。",
-  );
-
-  add(
-    2,
-    "food",
-    "咖啡香慢早餐",
-    "09:30",
-    "10:15",
-    2400,
-    "每人約 ¥1,200 × 2。食飽先出門，唔使趕早。",
-  );
-  add(
-    2,
-    "sight",
-    "時計台・聽老鐘報時",
-    "10:45",
-    "11:30",
-    700,
-    "成人門票示範 ¥350 × 2。安排 12/29 入內；1/1–1/3 休館，錯過可選 1/4 補看。開拓之村 12/29–1/3 休息，今次不排。",
-  );
-  add(
-    2,
-    "sight",
-    "電視塔・俯瞰雪白札幌",
+    "stay",
+    "中午：到達澳門 ＋ 寄存行李",
     "12:00",
-    "12:45",
-    2000,
-    "成人門票示範 ¥1,000 × 2。從高處影一張兩人旅行合照。",
+    "12:30",
+    "先去 YOHO金銀島酒店放低行李，輕裝出發。酒店：南灣區湖濱路12號；15:00 入住，11:00 退房，可免費寄存行李。呢份係示範行程，唔代表已訂房或已訂票。",
   );
   add(
-    2,
+    1,
     "food",
-    "午餐，再分一件蛋糕",
-    "13:15",
-    "15:00",
-    5600,
-    "午餐每人約 ¥1,800 × 2，咖啡甜點每人約 ¥1,000 × 2。搵間暖笠笠嘅咖啡店坐低。",
-  );
-  add(
-    2,
-    "sight",
-    "赤れんが庁舎・雪夜紅磚",
-    "16:30",
-    "17:15",
-    0,
-    "北海道廳舊本廳舍前庭慢步，睇紅磚同燈光。燈樹節赤れんが庁舎會場至 2027/2/28，16:30–22:00；呢張只安排戶外，入館另查時間。",
-  );
-  add(
-    2,
-    "food",
-    "成吉思汗烤肉之夜",
-    "18:00",
-    "19:30",
-    10000,
-    "每人約 ¥5,000 × 2。熱辣辣烤羊肉，記得預約同留件可洗外套。",
-  );
-  room(2, 18000);
-
-  add(
-    3,
-    "food",
-    "慢早餐，今日去小樽",
-    "09:00",
-    "09:45",
-    2400,
-    "每人約 ¥1,200 × 2。防滑鞋、手套同暖包帶齊。",
-  );
-  rail(3, "JR 札幌 → 小樽", "10:00", "10:55", 1600, "札幌站", "小樽站", 35);
-  add(
-    3,
-    "sight",
-    "小樽運河・雪景合照",
-    "11:30",
-    "12:15",
-    0,
-    "沿運河慢慢行，雪滑就縮短路段；留時間搵個靚角度。",
-  );
-  add(
-    3,
-    "food",
-    "小樽壽司，兩份幸福",
+    "午餐：新鴻咖啡（皇朝區）",
     "12:30",
     "13:30",
-    8000,
-    "每人約 ¥4,000 × 2。揀當日海鮮，熱門店先預約。",
+    "由酒店過去好近，必食招牌摩羅雞飯配凍奶茶／咖啡。小貼士：出發前建議先確認星期日有無營業，如果撞正休息可以調去第二朝食。",
   );
   add(
-    3,
+    1,
     "sight",
-    "玻璃小店與音樂盒",
+    "下午：大三巴牌坊 ＋ 戀愛巷",
     "14:00",
     "15:30",
-    0,
-    "堺町通玻璃工房／音樂盒堂逛一逛；手作體驗需預約，購物及體驗費另計。小樽雪あかりの路係 2 月活動，今次唔係活動期。",
+    "搭車去大三巴行下舊城區、沿途掃街買小食。順路行隔離嘅戀愛巷，粉紅粉黃葡式建築好啱情侶影合照。",
   );
   add(
-    3,
-    "sight",
-    "黃昏運河・等煤氣燈",
-    "16:00",
-    "16:45",
-    0,
-    "藍調雪景配煤氣燈，影完就入室內暖身。日落及亮燈時間出發前再確認。",
-  );
-  rail(3, "JR 小樽 → 札幌", "17:00", "17:55", 1600, "小樽站", "札幌站", 35);
-  add(
-    3,
-    "food",
-    "札幌熱湯晚餐",
-    "18:30",
-    "19:30",
-    4000,
-    "每人約 ¥2,000 × 2。返市區先食，風雪大就提早返。",
-  );
-  room(3, 20000);
-
-  add(
-    4,
-    "food",
-    "二條市場・海鮮早午餐",
-    "10:00",
-    "11:00",
-    6000,
-    "每人約 ¥3,000 × 2。新年營業各店不同，先確認；未開就改酒店附近早餐。",
-  );
-  add(
-    4,
-    "sight",
-    "除夕留白，慢慢行",
-    "11:30",
-    "13:00",
-    0,
-    "逛近酒店街區、寫張明信片。今日唔趕景點，午間留返室內休息。",
-  );
-  add(
-    4,
-    "food",
-    "買好元日早餐與小食",
-    "14:00",
-    "15:00",
-    3000,
-    "兩人元日早餐約 ¥1,000 × 2，加倒數小食約 ¥500 × 2。商店除夕早收、元日部分休業，早啲買好。",
-  );
-  add(
-    4,
-    "food",
-    "年越蕎麥麵・一齊跨年",
-    "17:30",
-    "18:30",
-    3600,
-    "每人約 ¥1,800 × 2。食一碗暖麵迎新年；先確認除夕營業，亦可買外帶返酒店。",
-  );
-  room(4, 26000, "19:00", "19:30");
-  add(
-    4,
-    "sight",
-    "酒店倒數・新年有你",
-    "23:30",
-    "23:59",
-    0,
-    "沖杯熱飲，陪你數到零時，講聲新年快樂。留喺房內自行倒數，唔係酒店官方活動；小食已計入補給。",
-  );
-
-  add(
-    5,
-    "food",
-    "新年慢早餐",
-    "09:30",
-    "10:15",
-    0,
-    "食噚日買好嘅早餐，費用已計入除夕補給。",
-  );
-  add(
-    5,
-    "transport",
-    "地鐵 → 圓山公園",
-    "10:30",
-    "11:30",
-    500,
-    "每人單程約 ¥250 × 2。札幌站一帶步行至大通站，搭東西線，再由圓山公園站步行約 15 分鐘；人潮雪路另留緩衝。",
-  );
-  add(
-    5,
-    "sight",
-    "北海道神宮・兩人初詣",
-    "11:30",
-    "13:00",
-    3000,
-    "一齊許新年願望、求御守／抽籤；每人預留約 ¥1,500 × 2，參拜本身免費。元日人多、參道可能結冰，要保暖防滑，攰就縮短排隊。參拜時間及交通管制以神宮官方公告為準。",
-  );
-  add(
-    5,
-    "transport",
-    "圓山公園 → 札幌",
-    "13:00",
-    "14:00",
-    500,
-    "每人單程約 ¥250 × 2。沿原路返市區，人多就慢慢等。",
-  );
-  add(
-    5,
-    "food",
-    "熱午餐，下午瞓個晏覺",
-    "14:00",
-    "15:00",
-    4000,
-    "每人約 ¥2,000 × 2。先確認仍營業嘅酒店餐廳／連鎖店；食完返房休息。",
-  );
-  add(
-    5,
-    "food",
-    "元日簡單晚餐",
-    "18:00",
-    "19:00",
-    4000,
-    "每人約 ¥2,000 × 2。好多餐廳休息，預先確認酒店附近選擇，便利店可作後備。",
-  );
-  room(5, 24000);
-
-  add(
-    6,
-    "food",
-    "賴床後的早餐",
-    "09:30",
-    "10:15",
-    2400,
-    "每人約 ¥1,200 × 2，食完先出門。",
-  );
-  add(
-    6,
-    "sight",
-    "初賣福袋・甜點約會",
-    "10:45",
-    "14:00",
-    6000,
-    "商場初賣逛一轉，午餐每人約 ¥2,000 × 2、甜點約 ¥1,000 × 2；福袋另計。可改白色戀人公園，請確認新年營業，門票／額外交通另計；兩個擇一，唔使趕。",
-  );
-  add(
-    6,
-    "transport",
-    "去藻岩山・雪路慢慢來",
-    "15:00",
-    "16:15",
-    1200,
-    "每人來回市內交通示範約 ¥600 × 2，一次計入。市電／地鐵加接駁，查好路線同回程；時段包括候車及雪天緩衝。",
-  );
-  add(
-    6,
-    "sight",
-    "藻岩山夜景・萬家燈火",
-    "16:30",
-    "18:00",
-    4200,
-    "成人纜車連迷你登山車來回示範 ¥2,100 × 2。12/31、1/1 休業；初日の出特別運行自 2026 年起取消，今次只睇夜景。確認當日天氣、運行及最後上山時間；強風大雪就取消。",
-  );
-  add(
-    6,
-    "food",
-    "返市區食暖暖晚餐",
-    "19:00",
-    "20:00",
-    6000,
-    "每人約 ¥3,000 × 2；預留落山回程時間。",
-  );
-  room(6, 22000);
-
-  add(
-    7,
-    "food",
-    "收拾輕便袋，慢早餐",
-    "09:30",
-    "10:30",
-    2400,
-    "每人約 ¥1,200 × 2。大行李先問札幌酒店可否寄存，溫泉只帶一晚用品。",
-  );
-  add(
-    7,
-    "transport",
-    "札幌站 → 定山溪・巴士",
-    "11:00",
-    "13:00",
-    3400,
-    "河童號需預約，車程約 60 分鐘，每人單程示範 ¥1,700 × 2；或路線巴士約 80 分鐘，每人約 ¥1,000，兩者擇一。呢個係含候車雪天緩衝嘅時段，唔係班次；請向じょうてつ官方確認。",
-  );
-  add(
-    7,
-    "food",
-    "溫泉街熱午餐",
-    "13:00",
-    "14:00",
-    3600,
-    "每人約 ¥1,800 × 2。先確認新年營業，旅館可否提供午餐亦可預先問。",
-  );
-  add(
-    7,
+    1,
     "stay",
-    "溫泉旅館（請填寫）",
-    "15:00",
-    "15:30",
-    56000,
-    "1/3 入住、1/4 退房，兩位成人共一間房。每人一泊二食約 ¥28,000 × 2＝兩人 ¥56,000，含會席晚餐及翌日早餐，唔係已訂房；請確認稅項及泡湯規則。",
-  );
-  add(
-    7,
-    "sight",
-    "雪見露天風呂・慢下來",
+    "15:00 後：返酒店 Check-in 休息",
     "16:00",
-    "17:00",
-    0,
-    "泡湯費已包喺住宿示範；按旅館浴場安排分開浸，想一齊浸可先問私人風呂，額外費用另計。一般浴場唔使泳衣，入池前沖身、毛巾唔入水。",
+    "17:30",
+    "返金銀島酒店拎房，喺房影下南灣湖景或者去無邊際泳池打卡、抖一抖。YOHO金銀島酒店；呢份係示範行程，唔代表已訂房。",
   );
   add(
-    7,
+    1,
     "food",
-    "旅館晚餐・會席小約會",
+    "晚餐：贏到粥（下環區）",
     "18:00",
     "19:30",
-    0,
-    "已包一泊二食，唔重複計費；準時返旅館，慢慢享受季節料理，酒水另計。",
+    "必點卜卜蜆、手撕雞、椒鹽粟米。小貼士：星期日晚市非常爆場，記得一定要提早訂位。",
   );
   add(
-    7,
+    1,
     "sight",
-    "浴衣時光，暖暖散步",
+    "飯後散步：永利澳門",
     "20:00",
-    "20:30",
-    0,
-    "著浴衣喺館內散步、飲杯茶，室外要加厚外套。定山溪雪燈路 2027/1/20 先開始，今次唔係雪燈路活動期。",
+    "21:00",
+    "食飽返酒店前可以順路睇埋免費音樂噴泉，夜晚燈光配水舞好浪漫，之後行返酒店休息。",
   );
-
   add(
-    8,
-    "food",
-    "旅館早餐・再望一眼雪",
-    "09:00",
+    2,
+    "stay",
+    "上午：退房 ＋ 寄存行李",
     "10:00",
-    0,
-    "已含住宿費；退房時間以旅館為準，唔趕住起身。",
-  );
-  add(
-    8,
-    "sight",
-    "定山溪足湯・最後暖一暖",
-    "10:15",
-    "10:45",
-    0,
-    "帶小毛巾，先確認足湯冬季開放及雪路狀況；天氣差就留館內休息。",
-  );
-  add(
-    8,
-    "transport",
-    "定山溪 → 札幌・巴士",
     "11:00",
-    "13:00",
-    3400,
-    "河童號預約制約 60 分鐘，每人單程約 ¥1,700 × 2；或路線巴士約 80 分鐘，每人約 ¥1,000。兩者擇一，班次及票價請向官方確認；雪天留延誤緩衝。",
+    "11:00 前喺酒店退房並寄存行李（如果第一日未食到摩羅雞飯，可以趁今朝去食）。YOHO金銀島酒店可免費寄存行李。",
   );
   add(
-    8,
-    "food",
-    "札幌午餐，取返行李",
-    "13:00",
+    2,
+    "sight",
+    "中午：官也街 ＋ 龍環葡韻",
+    "12:00",
     "14:00",
-    4000,
-    "每人約 ¥2,000 × 2。先返酒店取寄存行李，再安排入住。",
+    "過海去氹仔官也街掃街（豬扒包、木糠布甸、牛雜）兼買手信。行去隔離龍環葡韻影薄荷綠色葡式別墅同濕地生態區（留意室內博物館逢星期一休館，戶外園區同創薈館照常開放）。",
   );
-  room(8, 18000, "14:15", "14:45");
   add(
-    8,
+    2,
     "sight",
-    "時計台補看（可選）",
-    "15:00",
-    "15:45",
-    0,
-    "只限 12/29 錯過先去，先查當日營業；如入內，成人票示範 ¥350 × 2＝¥700 另加，未計入總額。",
-  );
-  add(
-    8,
-    "sight",
-    "最後手信・揀份甜回憶",
-    "16:00",
-    "17:15",
-    10000,
-    "兩人共用手信預算，朱古力、餅乾留啲位放行李。",
-  );
-  add(
-    8,
-    "food",
-    "最後一晚・海鮮與蟹",
-    "18:00",
-    "19:30",
-    16000,
-    "每人約 ¥8,000 × 2。預約一餐好好食嘅海鮮／蟹料理，為旅程乾杯。",
-  );
-
-  add(
-    9,
-    "food",
-    "早餐退房・慢慢道別",
-    "08:30",
-    "09:15",
-    2400,
-    "每人約 ¥1,200 × 2。今日時間須按真實航班調整，先查 JR 運行。",
-  );
-  rail(
-    9,
-    "JR 札幌 → 新千歲機場",
-    "09:45",
-    "10:45",
-    2460,
-    "札幌站",
-    "新千歲機場",
-    40,
-  );
-  add(
-    9,
-    "sight",
-    "雪天緩衝・先辦登機",
-    "10:45",
-    "12:00",
-    0,
-    "預留雪天延誤及航空公司要求嘅報到時間；遇延誤就跳過購物午餐，提早出發。",
-  );
-  add(
-    9,
-    "food",
-    "機場手信／拉麵道場",
-    "12:00",
-    "13:00",
-    3200,
-    "新千歲機場拉麵每人約 ¥1,600 × 2，追加手信另計；只喺辦好登機而且時間足夠先去。",
-  );
-  add(
-    9,
-    "transport",
-    "回程航班（請填寫）",
+    "下午：威尼斯人 ＋ 倫敦人 ＋ 巴黎人",
     "14:30",
-    "16:00",
-    0,
-    "請填實際航班及費用；呢段唔係起飛時間或航程。帶住兩個人嘅雪地回憶返香港。",
+    "16:30",
+    "轉戰路氹區，一次過影齊意式大運河、英倫大笨鐘同法式艾菲爾鐵塔。沿途可以入商場行街、嘆杯 Cafe 或者登鐵塔觀景台。",
   );
-
+  add(
+    2,
+    "sight",
+    "傍晚：永利皇宮 ＋ 回程",
+    "17:00",
+    "18:30",
+    "走之前推薦去永利皇宮免費搭觀光纜車睇日落／夜景噴泉。之後視乎時間返酒店攞行李，出發去口岸返歸。此時段只作傍晚安排，實際回程時間待定。",
+  );
   const packing = {
-    衣服: [
-      "羽絨或厚外套（兩人各一）",
-      "保暖內層",
-      "手套",
-      "頸巾",
-      "暖帽",
-      "防水防滑雪靴",
-      "厚襪（多備）",
-      "防滑鞋釘（室內拆除）",
-    ],
-    證件: [
-      "兩人護照",
-      "機票／登機證",
-      "酒店及溫泉旅館確認",
-      "旅遊保險",
-      "信用卡／日圓現金",
-    ],
-    電子: [
-      "兩人手機",
-      "充電線",
-      "流動電源",
-      "日本適用插頭（A 型）",
-      "手提充電器",
-    ],
-    藥品: ["各自常備藥", "潤唇膏", "保濕面霜／潤膚", "暖包（多備）"],
-    其他: [
-      "太陽眼鏡（雪地反光）",
-      "摺疊袋",
-      "少量即食／能量棒",
-      "行李雨套",
-      "保溫瓶",
-      "足湯小毛巾（一般溫泉不需要泳衣）",
-    ],
+    衣服: ["薄外套", "一晚替換衣物", "舒適步行鞋"],
+    證件: ["兩人出入境證件", "信用卡／少量澳門幣或港幣"],
+    電子: ["手機", "充電器及充電線", "流動電源"],
+    藥品: ["各自常備藥"],
+    其他: ["摺疊傘", "手信摺疊袋"],
   };
   return {
     version: 2,
     trip: defaultTrip(),
     groups: [...DEFAULT_GROUPS],
     items,
-    expenses: [
-      {
-        id: "extra-1",
-        date: DEFAULT_DATES[0],
-        category: "other",
-        title: "兩人上網 eSIM",
-        cost: 2400,
-        notes:
-          "每人示範 ¥1,200 × 2＝兩人 ¥2,400；獨立支出，未列於行程。請確認方案及裝置支援。",
-      },
-    ],
+    expenses: [],
     packing: DEFAULT_GROUPS.flatMap((group) =>
       packing[group].map((title, index) => ({
         id: `pack-${group}-${index}`,
@@ -834,6 +358,8 @@ function normalizeState(s) {
     version: 2,
     trip: {
       ...trip,
+      currency: trip.currency === "MOP" ? "MOP" : "JPY",
+      timeZone: trip.timeZone === "Asia/Macau" ? "Asia/Macau" : "Asia/Tokyo",
       themes: Object.fromEntries(dates.map((d) => [d, trip.themes[d]])),
     },
     groups: [...groups],
@@ -895,16 +421,28 @@ let manifestObjectURL;
 let manifestName = "";
 function updateManifest(trip) {
   const name = `${trip.title} · ${trip.stamp}`;
-  if (name === manifestName) return;
-  manifestName = name;
+  const signature = JSON.stringify([
+    name,
+    trip.startDate,
+    trip.endDate,
+    trip.destination,
+  ]);
+  if (signature === manifestName) return;
+  manifestName = signature;
   manifestTemplate ??= fetch("./manifest.webmanifest").then((response) => {
     if (!response.ok) throw new Error("manifest unavailable");
     return response.json();
   });
   manifestTemplate
     .then((template) => {
-      if (name !== manifestName) return;
-      if (name === template.name && trip.title === template.short_name) {
+      if (signature !== manifestName) return;
+      if (
+        name === template.name &&
+        trip.title === template.short_name &&
+        trip.startDate === DEFAULT_DATES[0] &&
+        trip.endDate === DEFAULT_DATES.at(-1) &&
+        trip.destination === "澳門"
+      ) {
         $('link[rel="manifest"]').href = "./manifest.webmanifest";
         if (manifestObjectURL) URL.revokeObjectURL(manifestObjectURL);
         manifestObjectURL = undefined;
@@ -913,6 +451,7 @@ function updateManifest(trip) {
       const manifest = {
         ...template,
         name,
+        description: `${trip.stamp}：${trip.startDate}–${trip.endDate}，${trip.destination}旅行手帳。`,
         short_name: trip.title,
         id: new URL(template.id, document.baseURI).href,
         start_url: new URL(template.start_url, document.baseURI).href,
@@ -936,13 +475,18 @@ function updateManifest(trip) {
     });
 }
 
-// Japan has a fixed UTC+09:00 offset. Never use the device's local date here.
+// Use the trip time zone, independent of the device. Old backups retain Tokyo.
 function renderCountdown() {
   const { startDate, endDate, destination } = state.trip;
   const now = Date.now();
-  const today = new Date(now + 9 * 3600000).toISOString().slice(0, 10);
+  const offset = state.trip.timeZone === "Asia/Macau" ? 8 : 9;
+  const today = new Date(now + offset * 3600000).toISOString().slice(0, 10);
   const calendarDays = (date) => Date.parse(`${date}T00:00:00Z`) / DAY_MS;
-  const start = Date.parse(`${startDate}T00:00:00+09:00`);
+  const start = Date.parse(`${startDate}T00:00:00+0${offset}:00`);
+  $("#countdown-zone").textContent =
+    state.trip.timeZone === "Asia/Macau"
+      ? "以澳門時間計 · Asia/Macau（UTC+8）· 出發日 00:00 起"
+      : "以日本時間計 · Asia/Tokyo（UTC+9）· 出發日 00:00 起";
   let status, detail;
   if (today < startDate) {
     const days = calendarDays(startDate) - calendarDays(today);
@@ -985,11 +529,13 @@ window.addEventListener("pageshow", startCountdown);
 function renderHighlights() {
   // Derive stamps from actual activity titles, so replacement imports have no stale highlights.
   const highlights = [
-    [/雪見露天風呂/, "定山溪雪見溫泉"],
-    [/藻岩山夜景/, "藻岩山夜景"],
-    [/小樽運河/, "小樽運河"],
-    [/北海道神宮.*初詣/, "神宮初詣"],
-    [/燈樹節/, "燈樹節散步"],
+    [/新鴻咖啡/, "新鴻咖啡"],
+    [/大三巴牌坊.*戀愛巷/, "大三巴 ＋ 戀愛巷"],
+    [/贏到粥/, "贏到粥"],
+    [/飯後散步.*永利澳門/, "永利澳門"],
+    [/官也街.*龍環葡韻/, "官也街 ＋ 龍環葡韻"],
+    [/威尼斯人.*倫敦人.*巴黎人/, "路氹三館"],
+    [/永利皇宮/, "永利皇宮"],
   ].filter(([pattern]) => state.items.some((item) => pattern.test(item.title)));
   $("#trip-highlights").hidden = state.tab !== "plan" || !highlights.length;
   $("#highlight-chips").innerHTML = highlights
@@ -1001,6 +547,12 @@ function render() {
   const trip = state.trip;
   document.title = `${trip.title} · ${trip.stamp}`;
   updateManifest(trip);
+  const description = `${trip.stamp}：${trip.startDate.replaceAll("-", "/")}–${trip.endDate.replaceAll("-", "/")}，${trip.destination}行程、出發倒數、旅費與攜帶用品，所有內容都可以編輯。`;
+  $('meta[name="description"]').content = description;
+  $("#cost-currency").textContent = currencyLabel();
+  $("#rate-currency").textContent = `${currencyLabel()}1`;
+  $("#rate-example").textContent =
+    `${trip.currency === "MOP" ? "澳門幣大約跟港幣掛鉤。" : ""}例如 ${trip.exchangeRate}，即 ${currencyLabel()}1 ≈ HK$${trip.exchangeRate}。呢個係估算，可自行修改；費用總覽會即時重新計算。`;
   $("#brand-title").textContent = trip.title;
   $("#brand-eyebrow").textContent = trip.eyebrow;
   $("#stamp-label").textContent = trip.stamp;
@@ -1086,7 +638,7 @@ function breakdownMarkup(item) {
   const b = item.breakdown;
   const steps = [
     { icon: WALK, value: b.walk1, name: "步行" },
-    { icon: TRAIN, value: b.train, name: "火車" },
+    { icon: TRAIN, value: b.train, name: "乘車" },
     { icon: WALK, value: b.walk2, name: "步行" },
   ].filter((s) => s.value > 0);
   if (!steps.length) return "";
@@ -1097,7 +649,7 @@ function activityMarkup(item, preview = false) {
   const duration = minutes(item.end) - minutes(item.start);
   const price =
     item.cost > 0
-      ? ` · ${item.costLabel ? `${escapeHTML(item.costLabel)} ` : ""}${yen(item.cost)}`
+      ? ` · ${item.costLabel ? `${escapeHTML(item.costLabel)} ` : ""}${money(item.cost)}`
       : "";
   const element = preview ? "article" : "button";
   return `<${element} ${preview ? "" : 'type="button"'} class="activity-card" style="--category:${category.color}" ${preview ? "" : `data-item="${escapeHTML(item.id)}" aria-label="${escapeHTML(item.title)}，${item.start}至${item.end}，單擊預覽、雙擊編輯"`}>
@@ -1160,18 +712,18 @@ function expenseEntries() {
 function renderExpenses() {
   const entries = expenseEntries();
   const total = entries.reduce((sum, i) => sum + i.cost, 0);
-  $("#grand-total").textContent = yen(total);
+  $("#grand-total").textContent = money(total);
   $("#hkd-total").textContent =
     `約 HK$${Math.round(total * state.trip.exchangeRate).toLocaleString("zh-TW")}`;
   $("#per-person-total").textContent =
-    `兩人平分 · 每人約 ${yen(total / 2)} / HK$${Math.round((total * state.trip.exchangeRate) / 2).toLocaleString("zh-TW")}`;
+    `兩人平分 · 每人約 ${money(total / 2)} / HK$${Math.round((total * state.trip.exchangeRate) / 2).toLocaleString("zh-TW")}`;
   $("#budget-label").textContent = state.items.every(
     (i) => i.costLabel === "兩人示範",
   )
     ? "兩人示範預算"
     : "兩人旅費總計";
   $("#exchange-note").textContent =
-    `估算匯率 ¥1 ≈ HK$${state.trip.exchangeRate} · 可在旅程設定修改`;
+    `估算匯率 ${currencyLabel()}1 ≈ HK$${state.trip.exchangeRate} · 可在旅程設定修改`;
   const cats = { ...CATEGORIES, other: { name: "其他", color: "#d9c2d9" } };
   const sums = Object.entries(cats).map(([key, cat]) => ({
     key,
@@ -1184,20 +736,20 @@ function renderExpenses() {
     .filter((c) => c.total > 0)
     .map(
       (c) =>
-        `<span style="width:${(c.total / total) * 100}%;background:${c.color}" title="${c.name} ${yen(c.total)}"></span>`,
+        `<span style="width:${(c.total / total) * 100}%;background:${c.color}" title="${c.name} ${money(c.total)}"></span>`,
     )
     .join("");
   $("#expense-categories").innerHTML = sums
     .map(
       (c) =>
-        `<div class="expense-category"><i class="dot" style="background:${c.color}"></i><span>${c.name}</span><strong>${yen(c.total)}</strong></div>`,
+        `<div class="expense-category"><i class="dot" style="background:${c.color}"></i><span>${c.name}</span><strong>${money(c.total)}</strong></div>`,
     )
     .join("");
   $("#expense-list").innerHTML = entries.length
     ? entries
         .map(
           (i) =>
-            `<button type="button" class="expense-item" data-expense="${escapeHTML(i.id)}" data-source="${i.source}" aria-label="編輯${escapeHTML(i.title)}的費用"><i class="dot" style="background:${cats[i.category].color}"></i><span class="expense-info"><strong>${escapeHTML(i.title)}</strong><small>${shortDate(i.date)} · ${cats[i.category].name} · ${i.source === "expense" ? "獨立支出" : "來自行程"}</small></span><span class="amount">${yen(i.cost)}</span><span class="edit-arrow" aria-hidden="true">›</span></button>`,
+            `<button type="button" class="expense-item" data-expense="${escapeHTML(i.id)}" data-source="${i.source}" aria-label="編輯${escapeHTML(i.title)}的費用"><i class="dot" style="background:${cats[i.category].color}"></i><span class="expense-info"><strong>${escapeHTML(i.title)}</strong><small>${shortDate(i.date)} · ${cats[i.category].name} · ${i.source === "expense" ? "獨立支出" : "來自行程"}</small></span><span class="amount">${money(i.cost)}</span><span class="edit-arrow" aria-hidden="true">›</span></button>`,
         )
         .join("")
     : '<p class="empty-state">還沒有支出，記下旅途的第一筆吧。</p>';
@@ -1540,7 +1092,7 @@ async function saveSettings(event) {
       rate <= 0 ||
       rate > 1000
     )
-      throw new Error("匯率請填大過 0、不超過 1000 的數字，例如 0.052。");
+      throw new Error("匯率請填大過 0、不超過 1000 的數字，例如 0.97。");
     const themes = Object.fromEntries(
       dates.map((d, i) => [
         d,
@@ -1568,6 +1120,7 @@ async function saveSettings(event) {
     const next = normalizeState({
       ...state,
       trip: {
+        ...state.trip,
         title: value("tripTitle"),
         destination: value("destination"),
         eyebrow: value("eyebrow"),
@@ -1887,14 +1440,14 @@ async function resetData() {
   if (
     await confirmAction(
       "重新翻開示範手帳？",
-      "目前全部行程、費用、行李及旅程設定都會被北海道過年示範資料取代，無法復原。建議先匯出備份。",
+      "目前全部行程、費用、行李及旅程設定都會被澳門兩日一夜情侶示範資料取代，無法復原。建議先匯出備份。",
       "還原示範資料",
     )
   ) {
     clearTimeout(tapTimer);
     state = seedState();
     $("#settings-dialog").close();
-    changed("北海道過年示範行程已還原");
+    changed("澳門兩日一夜情侶示範行程已還原");
   }
 }
 $("#reset-data").addEventListener("click", resetData);
